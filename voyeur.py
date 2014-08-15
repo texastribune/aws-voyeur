@@ -21,7 +21,7 @@ from boto import ec2
 from tabulate import tabulate
 
 
-headers = (
+HEADERS = (
     'name',
     'environment',
     'site',
@@ -33,6 +33,8 @@ headers = (
 
 
 def to_row(instance):
+    """Format data about the instance to be printed."""
+    # WISHLIST use `sort_key` and `HEADERS` to be DRY?
     return (
         instance.tags.get('Name'),
         instance.tags.get('environment'),
@@ -40,15 +42,17 @@ def to_row(instance):
         instance.ip_address, instance.private_ip_address,
         instance.launch_time.split('T', 2)[0],
         instance.id,
-        # instance.tags
     )
 
 
 def sort_key(key):
+    """Get the accessor function for an instance to look for `key`."""
+    # look for tags that match
     if key == 'name':
         return lambda x: x.tags.get('Name')
     if key in ('environment', 'site'):
         return lambda x: x.tags.get(key)
+    # look for attributes that match
     return lambda x: getattr(x, key)
 
 
@@ -65,20 +69,18 @@ def main(sort_by=None, filter_by=None):
     instances = conn.get_only_instances()
 
     if sort_by:
-        instances.sort(
-            key=sort_key(sort_by),
-        )
+        instances.sort(key=sort_key(sort_by))
     if filter_by:
-        instances = filter(filter_key(filter_by), instances)  # XXX modifying original
+        instances = filter(filter_key(filter_by), instances)  # XXX overwriting original
 
-    print tabulate(map(to_row, instances), headers=headers)
+    print tabulate(map(to_row, instances), headers=HEADERS)
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if '=' in sys.argv[1]:
             key, value = sys.argv[1].split('=', 2)
-            if key not in headers:
+            if key not in HEADERS:
                 exit('{} not valid'.format(key))
             main(filter_by={key: value})
         else:
