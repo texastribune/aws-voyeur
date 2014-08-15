@@ -1,0 +1,4 @@
+*.pyc
+
+# private user content
+.env
