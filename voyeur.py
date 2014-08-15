@@ -73,7 +73,9 @@ if __name__ == '__main__':
             if key not in HEADERS:
                 exit('{} not valid'.format(key))
             main(filter_by={key: value})
-        else:
+        elif sys.argv[1] in HEADERS:
             main(sort_by=sys.argv[1])
+        else:
+            exit('{} not valid'.format(sys.argv[1]))
     else:
         main()
