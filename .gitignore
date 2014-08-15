@@ -2,3 +2,10 @@
 
 # private user content
 .env
+
+# generated files
+*.egg
+*.egg-info/
+__pycache__
+build/
+dist/

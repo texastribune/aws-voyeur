@@ -53,7 +53,7 @@ def filter_key(filter_args):
     return filter_instance
 
 
-def main(sort_by=None, filter_by=None):
+def voyeur(sort_by=None, filter_by=None):
     conn = ec2.connect_to_region('us-east-1')  # XXX magic constant
 
     instances = conn.get_only_instances()
@@ -66,16 +66,20 @@ def main(sort_by=None, filter_by=None):
     print tabulate(map(to_row, instances), headers=HEADERS)
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) > 1:
         if '=' in sys.argv[1]:
             key, value = sys.argv[1].split('=', 2)
             if key not in HEADERS:
                 exit('{} not valid'.format(key))
-            main(filter_by={key: value})
+            voyeur(filter_by={key: value})
         elif sys.argv[1] in HEADERS:
-            main(sort_by=sys.argv[1])
+            voyeur(sort_by=sys.argv[1])
         else:
             exit('{} not valid'.format(sys.argv[1]))
     else:
-        main()
+        voyeur()
+
+
+if __name__ == '__main__':
+    main()
