@@ -52,11 +52,10 @@ def sort_key(key):
     return lambda x: getattr(x, key)
 
 
-def filter_key(filter):
+def filter_key(filter_args):
     def filter_instance(instance):
-        for key, value in filter.items():
-            instance_value = sort_key(key)(instance)
-            return instance_value == value
+        return all([value == sort_key(key)(instance)
+            for key, value in filter_args.items()])
     return filter_instance
 
 
