@@ -24,6 +24,9 @@ You can filter similarily like:
 
     voyeur environment=production
 
+Or go crazy (show production foo sites ordered by launch time):
+
+    voyeru environment=production site=foo launch_time
 
 ## Installation
 

@@ -67,18 +67,22 @@ def voyeur(sort_by=None, filter_by=None):
 
 
 def main():
-    if len(sys.argv) > 1:
-        if '=' in sys.argv[1]:
-            key, value = sys.argv[1].split('=', 2)
+    filter_by_kwargs = {}
+    sort_by = None  # WISHLIST have a tuple
+    for arg in sys.argv[1:]:
+        if arg.startswith('-'):
+            # ignore options
+            continue
+        if '=' in arg:
+            key, value = arg.split('=', 2)
             if key not in HEADERS:
                 exit('{} not valid'.format(key))
-            voyeur(filter_by={key: value})
-        elif sys.argv[1] in HEADERS:
-            voyeur(sort_by=sys.argv[1])
+            filter_by_kwargs[key] = value
+        elif arg in HEADERS:
+            sort_by = arg
         else:
-            exit('{} not valid'.format(sys.argv[1]))
-    else:
-        voyeur()
+            print 'skipped', arg
+    voyeur(sort_by=sort_by, filter_by=filter_by_kwargs)
 
 
 if __name__ == '__main__':
