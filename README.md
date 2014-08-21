@@ -38,3 +38,24 @@ Configure boto following [the official instructions](http://boto.readthedocs.org
 
 A basic configuration would just involve setting the `AWS_ACCESS_KEY_ID`,
 `AWS_SECRET_ACCESS_KEY` environment variables.
+
+
+## AWS IAM Policy
+
+This library requires the DescribeInstances and DescribeInstaceStatus
+permissions, but it looks like common practice is to glob it like:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:Describe*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+```
