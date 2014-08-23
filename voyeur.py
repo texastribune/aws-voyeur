@@ -5,7 +5,6 @@ Quick n dirty CLI for checking ec2 inventory
 
 Specifically design for my own personal workflow.
 """
-from operator import attrgetter
 import sys
 
 from boto import ec2
@@ -14,19 +13,26 @@ import boto.ec2.elb
 
 
 def get_property_func(key):
-    """Get the accessor function for an instance to look for `key`."""
-    # look for tags that match
-    if key == 'name':
-        return lambda x: x.tags.get('Name')
-    if key in ('environment', 'site'):
-        return lambda x: x.tags.get(key)
-    # these are shortened for convenience
-    if key == 'ip':
-        return attrgetter('ip_address')
-    if key == 'private_ip':
-        return attrgetter('private_ip_address')
-    # look for attributes that match
-    return attrgetter(key)
+    """
+    Get the accessor function for an instance to look for `key`.
+
+    Look for it as an attribute, and if that does not work, look to see if it
+    is a tag.
+    """
+    aliases = {
+        'ip': 'ip_address',
+        'private_ip': 'private_ip_address',
+    }
+    unaliased_key = aliases.get(key, key)
+
+    def get_it(obj):
+        try:
+            return getattr(obj, unaliased_key)
+        except AttributeError:
+            if key == 'name':
+                return obj.tags.get('Name')
+            return obj.tags.get(key)
+    return get_it
 
 
 def filter_key(filter_args):
