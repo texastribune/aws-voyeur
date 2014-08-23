@@ -66,10 +66,10 @@ def voyeur(sort_by=None, filter_by=None):
     print tabulate(map(to_row, instances), headers=HEADERS)
 
 
-def list_ec2():
+def list_ec2(input_args):
     filter_by_kwargs = {}
     sort_by = None  # WISHLIST have a tuple
-    for arg in sys.argv[1:]:
+    for arg in input_args:
         if arg.startswith('-'):
             # ignore options
             continue
@@ -86,4 +86,9 @@ def list_ec2():
 
 
 if __name__ == '__main__':
-    list_ec2()
+    if len(sys.argv) <= 1:
+        list_ec2(sys.argv[1:])
+    elif sys.argv[1] == 'ec2':
+        list_ec2(sys.argv[2:])
+    else:
+        list_ec2(sys.argv[1:])
