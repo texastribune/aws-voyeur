@@ -54,7 +54,7 @@ def filter_key(filter_args):
     return filter_instance
 
 
-def voyeur(sort_by=None, filter_by=None):
+def voyeur_ec2(sort_by=None, filter_by=None):
     conn = ec2.connect_to_region('us-east-1')  # XXX magic constant
 
     instances = conn.get_only_instances()
@@ -63,8 +63,7 @@ def voyeur(sort_by=None, filter_by=None):
         instances.sort(key=sort_key(sort_by))
     if filter_by:
         instances = filter(filter_key(filter_by), instances)  # XXX overwriting original
-
-    print tabulate(map(to_row, instances), headers=HEADERS)
+    return map(to_row, instances)
 
 
 def list_ec2(input_args):
@@ -83,7 +82,9 @@ def list_ec2(input_args):
             sort_by = arg
         else:
             print 'skipped', arg
-    voyeur(sort_by=sort_by, filter_by=filter_by_kwargs)
+    print tabulate(
+        voyeur_ec2(sort_by=sort_by, filter_by=filter_by_kwargs),
+        headers=HEADERS)
 
 
 def list_elb(input_args):
