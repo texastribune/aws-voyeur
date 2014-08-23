@@ -13,7 +13,7 @@ from tabulate import tabulate
 import boto.ec2.elb
 
 
-def sort_key(key):
+def get_property_func(key):
     """Get the accessor function for an instance to look for `key`."""
     # look for tags that match
     if key == 'name':
@@ -31,29 +31,22 @@ def sort_key(key):
 
 def filter_key(filter_args):
     def filter_instance(instance):
-        return all([value == sort_key(key)(instance)
+        return all([value == get_property_func(key)(instance)
             for key, value in filter_args.items()])
     return filter_instance
 
 
 def voyeur(instances, to_row, sort_by=None, filter_by=None):
     if sort_by:
-        instances.sort(key=sort_key(sort_by))
+        instances.sort(key=get_property_func(sort_by))
     if filter_by:
         instances = filter(filter_key(filter_by), instances)  # XXX overwriting original
     return map(to_row, instances)
 
 
-def list_ec2(input_args):
-    headers = (
-        'name',
-        'environment',
-        'site',
-        'ip',
-        'private_ip',
-        'launch_time',
-        'id',
-    )
+def get_options(input_args, headers=None):
+    if headers is None:
+        headers = ()
     sort_by = None  # WISHLIST have a tuple
     filter_by_kwargs = {}
     for arg in input_args:
@@ -69,7 +62,20 @@ def list_ec2(input_args):
             sort_by = arg
         else:
             print 'skipped', arg
+    return sort_by, filter_by_kwargs
 
+
+def list_ec2(input_args):
+    headers = (
+        'name',
+        'environment',
+        'site',
+        'ip',
+        'private_ip',
+        'launch_time',
+        'id',
+    )
+    sort_by, filter_by_kwargs = get_options(input_args, headers)
     conn = ec2.connect_to_region('us-east-1')  # XXX magic constant
     instances = conn.get_only_instances()
     to_row = lambda x: (
@@ -92,10 +98,7 @@ def list_elb(input_args):
         'instance_count',
         'created_time',
     )
-
-    sort_by = None
-    filter_by_kwargs = {}
-
+    sort_by, filter_by_kwargs = get_options(input_args, headers)
     conn = boto.ec2.elb.connect_to_region('us-east-1')  # XXX magic constant
     instances = conn.get_all_load_balancers()
     to_row = lambda x: (
