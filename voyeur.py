@@ -12,30 +12,6 @@ from tabulate import tabulate
 import boto.ec2.elb
 
 
-HEADERS = (
-    'name',
-    'environment',
-    'site',
-    'ip',
-    'private_ip',
-    'launch_time',
-    'id',
-)
-
-
-def to_row(instance):
-    """Format data about the instance to be printed."""
-    # WISHLIST use `sort_key` and `HEADERS` to be DRY?
-    return (
-        instance.tags.get('Name'),
-        instance.tags.get('environment'),
-        instance.tags.get('site'),
-        instance.ip_address, instance.private_ip_address,
-        instance.launch_time.split('T', 2)[0],
-        instance.id,
-    )
-
-
 def sort_key(key):
     """Get the accessor function for an instance to look for `key`."""
     # look for tags that match
@@ -54,11 +30,7 @@ def filter_key(filter_args):
     return filter_instance
 
 
-def voyeur_ec2(sort_by=None, filter_by=None):
-    conn = ec2.connect_to_region('us-east-1')  # XXX magic constant
-
-    instances = conn.get_only_instances()
-
+def voyeur(instances, to_row, sort_by=None, filter_by=None):
     if sort_by:
         instances.sort(key=sort_key(sort_by))
     if filter_by:
@@ -67,24 +39,45 @@ def voyeur_ec2(sort_by=None, filter_by=None):
 
 
 def list_ec2(input_args):
-    filter_by_kwargs = {}
+    headers = (
+        'name',
+        'environment',
+        'site',
+        'ip',
+        'private_ip',
+        'launch_time',
+        'id',
+    )
     sort_by = None  # WISHLIST have a tuple
+    filter_by_kwargs = {}
     for arg in input_args:
         if arg.startswith('-'):
             # ignore options
             continue
         if '=' in arg:
             key, value = arg.split('=', 2)
-            if key not in HEADERS:
+            if key not in headers:
                 exit('{} not valid'.format(key))
             filter_by_kwargs[key] = value
-        elif arg in HEADERS:
+        elif arg in headers:
             sort_by = arg
         else:
             print 'skipped', arg
+
+    conn = ec2.connect_to_region('us-east-1')  # XXX magic constant
+    instances = conn.get_only_instances()
+    to_row = lambda x: (
+        x.tags.get('Name'),
+        x.tags.get('environment'),
+        x.tags.get('site'),
+        x.ip_address,
+        x.private_ip_address,
+        x.launch_time.split('T', 2)[0],
+        x.id,
+    )
     print tabulate(
-        voyeur_ec2(sort_by=sort_by, filter_by=filter_by_kwargs),
-        headers=HEADERS)
+        voyeur(instances, to_row=to_row, sort_by=sort_by, filter_by=filter_by_kwargs),
+        headers=headers)
 
 
 def list_elb(input_args):
@@ -94,13 +87,19 @@ def list_elb(input_args):
         'created_time',
     )
 
+    sort_by = None
+    filter_by_kwargs = {}
+
     conn = boto.ec2.elb.connect_to_region('us-east-1')  # XXX magic constant
     instances = conn.get_all_load_balancers()
-    print tabulate([(
+    to_row = lambda x: (
         x.name,
         len(x.instances),
         x.created_time,
-    ) for x in instances], headers=headers)
+    )
+    print tabulate(
+        voyeur(instances, to_row=to_row, sort_by=sort_by, filter_by=filter_by_kwargs),
+        headers=headers)
 
 
 if __name__ == '__main__':
