@@ -66,7 +66,7 @@ def voyeur(sort_by=None, filter_by=None):
     print tabulate(map(to_row, instances), headers=HEADERS)
 
 
-def main():
+def list_ec2():
     filter_by_kwargs = {}
     sort_by = None  # WISHLIST have a tuple
     for arg in sys.argv[1:]:
@@ -86,4 +86,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    list_ec2()
