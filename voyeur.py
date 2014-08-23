@@ -9,6 +9,7 @@ import sys
 
 from boto import ec2
 from tabulate import tabulate
+import boto.ec2.elb
 
 
 HEADERS = (
@@ -85,10 +86,28 @@ def list_ec2(input_args):
     voyeur(sort_by=sort_by, filter_by=filter_by_kwargs)
 
 
+def list_elb(input_args):
+    headers = (
+        'name',
+        'instance_count',
+        'created_time',
+    )
+
+    conn = boto.ec2.elb.connect_to_region('us-east-1')  # XXX magic constant
+    instances = conn.get_all_load_balancers()
+    print tabulate([(
+        x.name,
+        len(x.instances),
+        x.created_time,
+    ) for x in instances], headers=headers)
+
+
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
         list_ec2(sys.argv[1:])
     elif sys.argv[1] == 'ec2':
         list_ec2(sys.argv[2:])
+    elif sys.argv[1] == 'elb':
+        list_elb(sys.argv[2:])
     else:
         list_ec2(sys.argv[1:])
