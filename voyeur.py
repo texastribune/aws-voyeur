@@ -5,6 +5,7 @@ Quick n dirty CLI for checking ec2 inventory
 
 Specifically design for my own personal workflow.
 """
+from operator import attrgetter
 import sys
 
 from boto import ec2
@@ -19,8 +20,13 @@ def sort_key(key):
         return lambda x: x.tags.get('Name')
     if key in ('environment', 'site'):
         return lambda x: x.tags.get(key)
+    # these are shortened for convenience
+    if key == 'ip':
+        return attrgetter('ip_address')
+    if key == 'private_ip':
+        return attrgetter('private_ip_address')
     # look for attributes that match
-    return lambda x: getattr(x, key)
+    return attrgetter(key)
 
 
 def filter_key(filter_args):
