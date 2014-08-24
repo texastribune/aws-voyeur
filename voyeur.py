@@ -102,7 +102,8 @@ def list_ec2(input_args):
 def list_elb(input_args):
     headers = (
         'name',
-        'instance_count',
+        'dns_name',
+        'instances',
         'created_time',
     )
     sort_by, filter_by_kwargs = get_options(input_args, headers)
@@ -110,6 +111,7 @@ def list_elb(input_args):
     instances = conn.get_all_load_balancers()
     to_row = lambda x: (
         x.name,
+        x.dns_name,
         len(x.instances),
         x.created_time,
     )
