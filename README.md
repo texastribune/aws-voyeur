@@ -2,7 +2,8 @@ Quick n dirty CLI for checking ec2 inventory
 
 Specifically design for my own personal workflow.
 
-## Here Be Dragons
+Here Be Dragons
+---------------
 
 If you're doing something serious, you should look into these better
 alternatives:
@@ -34,11 +35,46 @@ I picked the columns and names so that line lengths are under 120 columns;
 which is how wide my terminal is.
 
 
-## But Wait, There's More
+But Wait, There's More
+----------------------
 
 If you make the first argument `elb` or `rds`, you can list your elastic load
 balancers and databases too. You can also do add `ec2` if you like being
 consistent.
+
+
+Example
+-------
+
+### List EC2
+
+```bash
+name                   environment    site     ip              private_ip      launch_time    id
+---------------------  -------------  -------  --------------  --------------  -------------  ----------
+hodor-weg              prod           groot    54.85.94.132    10.0.0.2        2014-06-17     i-27fghb69
+groot-elasticsearch    prod           hodor                    10.0.0.1        2014-08-08     i-abcdcaz7
+```
+
+
+### List ELB
+
+```bash
+$ voyeur elb
+name     dns_name                                     pool  created_time
+-------  -------------------------------------------  ------  ------------------------
+groot    groot-1529220.us-east-1.elb.amazonaws.com         3  2012-02-03T01:41:02.930Z
+hodor    hodor-4545272.us-east-1.elb.amazonaws.com         2  2014-03-08T06:15:53.610Z
+```
+
+### List RDS
+
+```bash
+$ voyeur rds
+id          uri
+----------  -------------------------------------------------------------------------------
+groot-db    postgres://iamgroot@groot-db.cya8ag0rj.us-east-1.rds.amazonaws.com:5432/groot
+hodor-db    postgres://iamgroot@hodor-db.cya8ag0rj.us-east-1.rds.amazonaws.com:5432/groot
+```
 
 
 ## Installation
