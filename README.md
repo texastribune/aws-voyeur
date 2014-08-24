@@ -2,6 +2,8 @@ Quick n dirty CLI for checking ec2 inventory
 
 Specifically design for my own personal workflow.
 
+## Here Be Dragons
+
 If you're doing something serious, you should look into these better
 alternatives:
 
@@ -42,16 +44,18 @@ A basic configuration would just involve setting the `AWS_ACCESS_KEY_ID`,
 
 ## AWS IAM Policy
 
-This library requires the DescribeInstances and DescribeInstaceStatus
-permissions, but it looks like common practice is to glob it like:
+This library requires the Describe* permissions. You can use use the "Read Only
+Access" policy template, or you can make your own with at least these
+permissions:
 
 ```json
 {
-  "Version": "2012-10-17",
   "Statement": [
     {
       "Action": [
-        "ec2:Describe*"
+        "ec2:Describe*",
+        "elasticloadbalancing:Describe*",
+        "rds:Describe*"
       ],
       "Effect": "Allow",
       "Resource": "*"
