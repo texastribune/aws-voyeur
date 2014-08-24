@@ -103,7 +103,7 @@ def list_elb(input_args):
     headers = (
         'name',
         'dns_name',
-        'instances',
+        'pool',  # not queryable/sortable
         'created_time',
     )
     sort_by, filter_by_kwargs = get_options(input_args, headers)

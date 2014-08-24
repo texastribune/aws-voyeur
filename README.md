@@ -14,7 +14,7 @@ alternatives:
 * awscli - official aws cli
 
 
-If you're still here, here's the deal: This is a CLI for querying ec2 for what
+If you're still here, here's the deal: This is a CLI for querying aws for what
 instances are running and display them in a table with the same columns I have
 enabled in the web interface. You can sort by specifying the headers:
 
@@ -28,7 +28,18 @@ You can filter similarily like:
 
 Or go crazy (show production foo sites ordered by launch time):
 
-    voyeru environment=production site=foo launch_time
+    voyeur environment=production site=foo launch_time
+
+I picked the columns and names so that line lengths are under 120 columns;
+which is how wide my terminal is.
+
+
+## But Wait, There's More
+
+If you make the first argument `elb` or `rds`, you can list your elastic load
+balancers and databases too. You can also do add `ec2` if you like being
+consistent.
+
 
 ## Installation
 
