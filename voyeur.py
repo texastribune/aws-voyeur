@@ -10,6 +10,7 @@ import sys
 from boto import ec2
 from tabulate import tabulate
 import boto.ec2.elb
+import boto.rds
 
 
 def get_property_func(key):
@@ -117,6 +118,28 @@ def list_elb(input_args):
         headers=headers)
 
 
+def list_rds(input_args):
+    def to_row(x):
+        """More complicated `to_row` to handle missing DBName attribute."""
+        data = x.__dict__.copy()
+        data['DBName'] = getattr(x, 'DBName', '???')
+        return (
+            x.id,
+            '{engine}://{master_username}@{_address}:{_port}/{DBName}'.format(**data),
+        )
+    headers = (
+        'id',
+        # 'engine',
+        'uri',  # derived
+    )
+    sort_by, filter_by_kwargs = get_options(input_args, headers)
+    conn = boto.rds.connect_to_region('us-east-1')
+    instances = conn.get_all_dbinstances()
+    print tabulate(
+        voyeur(instances, to_row=to_row, sort_by=sort_by, filter_by=filter_by_kwargs),
+        headers=headers)
+
+
 if __name__ == '__main__':
     if len(sys.argv) <= 1:
         list_ec2(sys.argv[1:])
@@ -124,5 +147,7 @@ if __name__ == '__main__':
         list_ec2(sys.argv[2:])
     elif sys.argv[1] == 'elb':
         list_elb(sys.argv[2:])
+    elif sys.argv[1] == 'rds':
+        list_rds(sys.argv[2:])
     else:
         list_ec2(sys.argv[1:])
