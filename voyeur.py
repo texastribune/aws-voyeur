@@ -142,7 +142,7 @@ def list_rds(input_args):
         headers=headers)
 
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) <= 1:
         list_ec2(sys.argv[1:])
     elif sys.argv[1] == 'ec2':
@@ -153,3 +153,7 @@ if __name__ == '__main__':
         list_rds(sys.argv[2:])
     else:
         list_ec2(sys.argv[1:])
+
+
+if __name__ == '__main__':
+    main()
