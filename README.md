@@ -12,6 +12,7 @@ alternatives:
   you glob
 * https://github.com/mattrobenolt/ec2 - lets you query instances using django-
   orm-like syntax
+* https://github.com/scopely-devops/skew - lets you glob ARNs
 * awscli - official aws cli
 
 
